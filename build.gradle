@@ -1,0 +1,73 @@
+plugins {
+    id 'java'
+    id "info.solidsoft.pitest" version "1.7.4"
+    id "com.github.spotbugs" version "$spotbugspluginVersion"
+}
+
+group = 'org.cariwork'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    maven{url 'https://maven.aliyun.com/repository/public'}
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:$findsecbugspluginVersion"
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+pitest {
+    targetClasses = ['mimic.*']
+    threads = 4
+    outputFormats = ['HTML']
+    timestampedReports = true
+    junit5PluginVersion = '0.15'
+}
+
+spotbugs {
+    toolVersion = "$spotbugsVersion"
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = true
+    effort = 'default'
+    reportLevel = 'low'
+    reportsDir = file("$buildDir/reports/spotbugs")
+    maxHeapSize = '2g'
+    extraArgs = [ '-nested:false' ]
+    jvmArgs = [ '-Duser.language=en' ]
+}
+
+spotbugsTest {
+    reports {
+        html {
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+spotbugsMain {
+    reports {
+        html {
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+apply from: "$rootDir/gradle/config/scripts/style.gradle"
+apply from: "$rootDir/gradle/config/scripts/coverage.gradle"
+coverage.excludePackages = [
+]
+coverage.excludeClasses = [
+]
+style.excludePackages = [
+]
+style.excludeClasses = [
+]
